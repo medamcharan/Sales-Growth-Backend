@@ -22,7 +22,7 @@ public class Order {
         this.id = id;
         this.createdAt = createdAt;
         this.totalPriceSet = totalPriceSet;
-        this.customerId = customerId;
+        this.customerId = customerId ;
     }
 
     // Getters and Setters
