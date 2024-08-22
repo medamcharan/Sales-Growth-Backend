@@ -21,91 +21,40 @@ public class OrderService {
         Aggregation aggregation = switch (interval) {
             case "daily" -> Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("created_at").exists(true)),
-                Aggregation.project("id", "email", "gateway", "total_price", "subtotal_price", "total_weight",
-                    "total_tax", "taxes_included", "currency", "financial_status", "confirmed", "processing_method",
-                    "presentment_currency", "total_line_items_price_set")
-                    .andExpression("dateToString('%Y-%m-%d', toDate(created_at))").as("date"),
+                Aggregation.project("id")
+                    .andExpression("dateToString('%Y-%m-%d', toDate(created_at))").as("date")
+                    .andExpression("toDouble(total_price)").as("totalPrice"),
                 Aggregation.group("date")
-                    .sum("total_line_items_price_set.shop_money.amount").as("totalSales")
+                    .sum("totalPrice").as("totalPrice")
                     .first("id").as("id")
-                    .first("email").as("email")
-                    .first("gateway").as("gateway")
-                    .first("total_price").as("total_price")
-                    .first("subtotal_price").as("subtotal_price")
-                    .first("total_weight").as("total_weight")
-                    .first("total_tax").as("total_tax")
-                    .first("taxes_included").as("taxes_included")
-                    .first("currency").as("currency")
-                    .first("financial_status").as("financial_status")
-                    .first("confirmed").as("confirmed")
-                    .first("processing_method").as("processing_method")
-                    .first("presentment_currency").as("presentment_currency")
             );
             case "monthly" -> Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("created_at").exists(true)),
-                Aggregation.project("id", "email", "gateway", "total_price", "subtotal_price", "total_weight",
-                    "total_tax", "taxes_included", "currency", "financial_status", "confirmed", "processing_method",
-                    "presentment_currency", "total_line_items_price_set")
-                    .andExpression("dateToString('%Y-%m', toDate(created_at))").as("date"),
+                Aggregation.project("id")
+                    .andExpression("dateToString('%Y-%m', toDate(created_at))").as("date")
+                    .andExpression("toDouble(total_price)").as("totalPrice"),
                 Aggregation.group("date")
-                    .sum("total_line_items_price_set.shop_money.amount").as("totalSales")
+                    .sum("totalPrice").as("totalPrice")
                     .first("id").as("id")
-                    .first("email").as("email")
-                    .first("gateway").as("gateway")
-                    .first("total_price").as("total_price")
-                    .first("subtotal_price").as("subtotal_price")
-                    .first("total_weight").as("total_weight")
-                    .first("total_tax").as("total_tax")
-                    .first("taxes_included").as("taxes_included")
-                    .first("currency").as("currency")
-                    .first("financial_status").as("financial_status")
-                    .first("confirmed").as("confirmed")
-                    .first("processing_method").as("processing_method")
-                    .first("presentment_currency").as("presentment_currency")
             );
             case "quarterly" -> Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("created_at").exists(true)),
-                Aggregation.project("id", "email", "gateway", "total_price", "subtotal_price", "total_weight",
-                    "total_tax", "taxes_included", "currency", "financial_status", "confirmed", "processing_method",
-                    "presentment_currency", "total_line_items_price_set")
-                    .andExpression("concat(dateToString('%Y-', toDate(created_at)), 'Q', (month(toDate(created_at)) - 1) / 3 + 1)").as("date"),
-                Aggregation.group("date")
-                    .sum("total_line_items_price_set.shop_money.amount").as("totalSales")
-                    .first("id").as("id")
-                    .first("email").as("email")
-                    .first("gateway").as("gateway")
-                    .first("total_price").as("total_price")
-                    .first("subtotal_price").as("subtotal_price")
-                    .first("total_weight").as("total_weight")
-                    .first("total_tax").as("total_tax")
-                    .first("taxes_included").as("taxes_included")
-                    .first("currency").as("currency")
-                    .first("financial_status").as("financial_status")
-                    .first("confirmed").as("confirmed")
-                    .first("processing_method").as("processing_method")
-                    .first("presentment_currency").as("presentment_currency")
-            );
+    Aggregation.match(Criteria.where("created_at").exists(true)),
+    Aggregation.project("id")
+        .andExpression("concat(dateToString('%Y', toDate(created_at)), 'Q', toString((month(toDate(created_at)) - 1) / 3 + 1))").as("date")
+        .andExpression("toDouble(total_price)").as("totalPrice"),
+    Aggregation.group("date")
+        .sum("totalPrice").as("totalPrice")
+        .first("id").as("id")
+);
+
             case "yearly" -> Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("created_at").exists(true)),
-                Aggregation.project("id", "email", "gateway", "total_price", "subtotal_price", "total_weight",
-                    "total_tax", "taxes_included", "currency", "financial_status", "confirmed", "processing_method",
-                    "presentment_currency", "total_line_items_price_set")
-                    .andExpression("dateToString('%Y', toDate(created_at))").as("date"),
+                Aggregation.project("id")
+                    .andExpression("dateToString('%Y', toDate(created_at))").as("date")
+                    .andExpression("toDouble(total_price)").as("totalPrice"),
                 Aggregation.group("date")
-                    .sum("total_line_items_price_set.shop_money.amount").as("totalSales")
+                    .sum("totalPrice").as("totalPrice")
                     .first("id").as("id")
-                    .first("email").as("email")
-                    .first("gateway").as("gateway")
-                    .first("total_price").as("total_price")
-                    .first("subtotal_price").as("subtotal_price")
-                    .first("total_weight").as("total_weight")
-                    .first("total_tax").as("total_tax")
-                    .first("taxes_included").as("taxes_included")
-                    .first("currency").as("currency")
-                    .first("financial_status").as("financial_status")
-                    .first("confirmed").as("confirmed")
-                    .first("processing_method").as("processing_method")
-                    .first("presentment_currency").as("presentment_currency")
             );
             default -> throw new IllegalArgumentException("Invalid interval: " + interval);
         };
